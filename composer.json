@@ -12,11 +12,11 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/mail": "4.2.*",
-        "illuminate/log": "4.2.*",
-        "illuminate/queue": "4.2.*",
-        "illuminate/support": "4.2.*",
-        "illuminate/view": "4.2.*",
+        "illuminate/mail": "4.1.*",
+        "illuminate/log": "4.1.*",
+        "illuminate/queue": "4.1.*",
+        "illuminate/support": "4.1.*",
+        "illuminate/view": "4.1.*",
         "twilio/sdk": "3.12.*",
         "guzzlehttp/guzzle": "4.2.*"
     },
