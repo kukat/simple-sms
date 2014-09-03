@@ -53,5 +53,9 @@ return [
         'companyKey' => 'Your Mozeo Company Key',
         'username' => 'Your Mozeo Username',
         'password' => 'Your Mozeo Password'
+    ],
+    'optikseis' => [
+        'username' => 'Your optikseis username',
+        'password' => 'Your optikseis password'
     ]
 ];

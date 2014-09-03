@@ -15,6 +15,7 @@ use SimpleSoftwareIO\SMS\Drivers\CallFireSMS;
 use SimpleSoftwareIO\SMS\Drivers\EmailSMS;
 use SimpleSoftwareIO\SMS\Drivers\EZTextingSMS;
 use SimpleSoftwareIO\SMS\Drivers\MozeoSMS;
+use SimpleSoftwareIO\SMS\Drivers\OptikseisSMS;
 use SimpleSoftwareIO\SMS\Drivers\TwilioSMS;
 
 class SMSServiceProvider extends ServiceProvider
@@ -88,6 +89,9 @@ class SMSServiceProvider extends ServiceProvider
             case 'mozeo':
                 return $this->buildMozeo();
 
+            case 'optikseis':
+                return $this->buildOptikseis();
+
             default:
                 throw new \InvalidArgumentException('Invalid SMS driver.');
         }
@@ -138,6 +142,20 @@ class SMSServiceProvider extends ServiceProvider
             'companykey' => $this->app['config']->get('simple-sms::mozeo.companyKey'),
             'username' => $this->app['config']->get('simple-sms::mozeo.username'),
             'password' => $this->app['config']->get('simple-sms::mozeo.password'),
+        ];
+
+        $provider->buildBody($auth);
+
+        return $provider;
+    }
+
+    protected function buildOptikseis()
+    {
+        $provider = new OptikseisSMS(new Client);
+
+        $auth = [
+            'username' => $this->app['config']->get('simple-sms::optikseis.username'),
+            'password' => $this->app['config']->get('simple-sms::optikseis.password'),
         ];
 
         $provider->buildBody($auth);
