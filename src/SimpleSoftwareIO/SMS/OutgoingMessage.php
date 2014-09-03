@@ -9,7 +9,7 @@
  *
  */
 
-use Illuminate\View\Factory;
+use Illuminate\View\Environment as Factory;
 
 class OutgoingMessage
 {
