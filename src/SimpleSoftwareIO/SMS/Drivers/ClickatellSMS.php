@@ -9,23 +9,88 @@
  *
  */
 
+use GuzzleHttp\Client;
 use SimpleSoftwareIO\SMS\OutgoingMessage;
 
-class ClickatellSMS extends AbstractSMS implements DriverInterface {
+class ClickatellSMS extends AbstractSMS implements DriverInterface 
+{
     /**
+     * @var Client
+     */
+    protected $client;
+
+    /**
+     * Configuration settings for Clickatell
      * @var Client
      */
     protected $config;
     
     /**
+     * The Clickatell Base URL
+     * 
      * @var string
      */
-    protected $apiBase;
+    protected $apiBase = 'https://api.clickatell.com';
 
-    function __construct()
+    /**
+    * The Clickatell session ID
+    *
+    * @var string
+    */
+    protected $session_id;
+
+    /**
+    * The Clickatell username
+    *
+    * @var string
+    */
+    protected $username;
+
+    /**
+    * The Clickatell password
+    *
+    * @var string
+    */
+    protected $password;
+
+    /**
+    * The Clickatell API ID
+    *
+    * @var string
+    */
+    protected $apiId;
+    
+    function __construct(Client $client)
     {
+        $this->client = $client;
         $this->config = Config::get('clickatell::clickatell');
-        $this->apiBase = $this->config['base_url'];
+        $this->username = $this->config['username'];
+        $this->password = $this->config['password'];
+        $this->apiId = $this->config['api_id'];
+
+        $this->authenticate();
+    }
+
+    /**
+    * Authenticates and opens SMS session
+    *
+    * @throws \ErrorException
+    * @return session
+    */
+    protected function authenticate()
+    {
+        // Authentication URL
+        $url = $this->apiBase."/http/auth?user=".$this->username."&password=".$this->password."&api_id=".$this->apiId;
+
+        // Do auth
+        $response = file($url);
+        $sess = explode(":",$response[0]);
+
+        if ($sess[0] == "OK") {
+            $this->session_id = trim($sess[1]);
+        } else {
+            throw new \RuntimeException('Authentication failure.');
+        }
     }
 
     /**
@@ -36,7 +101,7 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface {
      */
     protected function processReceive($rawMessage)
     {
-        throw new \RuntimeException('Optikseis does not support Inbound API Calls.');
+        throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
     }
 
     /**
@@ -49,16 +114,18 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface {
     {
         $composeMessage = $message->composeMessage();
 
-        foreach($message->getTo() as $to)
-        {
-            $data = [
-                'hp'        => $to,
-                'message'   => $composeMessage
-            ];
+        foreach($message->getTo() as $to){
+            $url = $this->apiBase."/http/sendmsg";
+            $url .= "?session_id=".$this->session_id;
+            $url .= "&to=".$to."&text=".$composeMessage;
 
-            $this->buildBody($data);
-
-            $this->getRequest();
+            $ret = file($url);
+            $response = explode(":",$ret[0]);
+            if ($send[0] == "ID") {
+                // TODO: action log
+            } else {
+                echo "send message failed";
+            }
         }
     }
 
@@ -70,7 +137,7 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface {
      */
     public function checkMessages(Array $options = array())
     {
-        throw new \RuntimeException('Optikseis does not support Inbound API Calls.');
+        throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
     }
 
     /**
@@ -81,7 +148,7 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface {
      */
     public function getMessage($messageId)
     {
-        throw new \RuntimeException('Optikseis does not support Inbound API Calls.');
+        throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
     }
 
     /**
@@ -92,7 +159,7 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface {
      */
     public function receive($raw)
     {
-        // TODO: Implement receive() method.  Waiting for Optikseis to Enable REST.
+        // TODO: Implement receive() method.
     }
 
 }

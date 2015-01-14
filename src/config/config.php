@@ -69,6 +69,5 @@ return [
         'username' => 'Your clickatell Username',
         'password' => 'Your clickatell Password',
         'api_id' => 'Your clickatell API Id',
-        'base_url' => 'https://api.clickatell.com' // No trailing slash
     ]
 ];
