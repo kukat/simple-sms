@@ -60,15 +60,12 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface
     */
     protected $apiId;
     
+    /**
+     * @param Client $client
+     */
     function __construct(Client $client)
     {
         $this->client = $client;
-        $this->config = Config::get('clickatell::clickatell');
-        $this->username = $this->config['username'];
-        $this->password = $this->config['password'];
-        $this->apiId = $this->config['api_id'];
-
-        $this->authenticate();
     }
 
     /**
@@ -80,7 +77,9 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface
     protected function authenticate()
     {
         // Authentication URL
-        $url = $this->apiBase."/http/auth?user=".$this->username."&password=".$this->password."&api_id=".$this->apiId;
+        $url = $this->apiBase."/http/auth?user=".$this->body['username']
+            ."&password=".$this->body['password']
+            ."&api_id=".$this->body['api_id'];
 
         // Do auth
         $response = file($url);
@@ -112,6 +111,7 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface
      */
     public function send(OutgoingMessage $message)
     {
+        $this->authenticate();
         $composeMessage = $message->composeMessage();
 
         foreach($message->getTo() as $to){
@@ -121,7 +121,7 @@ class ClickatellSMS extends AbstractSMS implements DriverInterface
 
             $ret = file($url);
             $response = explode(":",$ret[0]);
-            if ($send[0] == "ID") {
+            if ($response[0] == "ID") {
                 // TODO: action log
             } else {
                 echo "send message failed";
