@@ -12,154 +12,146 @@
 use GuzzleHttp\Client;
 use SimpleSoftwareIO\SMS\OutgoingMessage;
 
-class ClickatellSMS extends AbstractSMS implements DriverInterface 
-{
-    /**
-     * @var Client
-     */
-    protected $client;
+class ClickatellSMS extends AbstractSMS implements DriverInterface {
+	/**
+	 * @var Client
+	 */
+	protected $client;
 
-    /**
-     * Configuration settings for Clickatell
-     * @var Client
-     */
-    protected $config;
-    
-    /**
-     * The Clickatell Base URL
-     * 
-     * @var string
-     */
-    protected $apiBase = 'https://api.clickatell.com';
+	/**
+	 * Configuration settings for Clickatell
+	 * @var Client
+	 */
+	protected $config;
 
-    /**
-    * The Clickatell session ID
-    *
-    * @var string
-    */
-    protected $session_id;
+	/**
+	 * The Clickatell Base URL
+	 *
+	 * @var string
+	 */
+	protected $apiBase = 'https://api.clickatell.com';
 
-    /**
-    * The Clickatell username
-    *
-    * @var string
-    */
-    protected $username;
+	/**
+	 * The Clickatell session ID
+	 *
+	 * @var string
+	 */
+	protected $session_id;
 
-    /**
-    * The Clickatell password
-    *
-    * @var string
-    */
-    protected $password;
+	/**
+	 * The Clickatell username
+	 *
+	 * @var string
+	 */
+	protected $username;
 
-    /**
-    * The Clickatell API ID
-    *
-    * @var string
-    */
-    protected $apiId;
-    
-    /**
-     * @param Client $client
-     */
-    function __construct(Client $client)
-    {
-        $this->client = $client;
-    }
+	/**
+	 * The Clickatell password
+	 *
+	 * @var string
+	 */
+	protected $password;
 
-    /**
-    * Authenticates and opens SMS session
-    *
-    * @throws \ErrorException
-    * @return session
-    */
-    protected function authenticate()
-    {
-        // Authentication URL
-        $url = $this->apiBase."/http/auth?user=".$this->body['username']
-            ."&password=".$this->body['password']
-            ."&api_id=".$this->body['api_id'];
+	/**
+	 * The Clickatell API ID
+	 *
+	 * @var string
+	 */
+	protected $apiId;
 
-        // Do auth
-        $response = file($url);
-        $sess = explode(":",$response[0]);
+	/**
+	 * @param Client $client
+	 */
+	function __construct(Client $client) {
+		$this->client = $client;
+	}
 
-        if ($sess[0] == "OK") {
-            $this->session_id = trim($sess[1]);
-        } else {
-            throw new \RuntimeException('Authentication failure.');
-        }
-    }
+	/**
+	 * Authenticates and opens SMS session
+	 *
+	 * @throws \ErrorException
+	 * @return session
+	 */
+	protected function authenticate() {
+		// Authentication URL
+		$url = $this->apiBase . "/http/auth?user=" . $this->body['username']
+		. "&password=" . $this->body['password']
+		. "&api_id=" . $this->body['api_id'];
 
-    /**
-     * Creates many IncomingMessage objects and sets all of the properties.
-     *
-     * @param $rawMessage
-     * @return mixed
-     */
-    protected function processReceive($rawMessage)
-    {
-        throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
-    }
+		// Do auth
+		$response = file($url);
+		$sess = explode(":", $response[0]);
 
-    /**
-     * Sends a SMS message
-     *
-     * @parma SimpleSoftwareIO\SMS\Message @messasge The message class.
-     * @return void
-     */
-    public function send(OutgoingMessage $message)
-    {
-        $this->authenticate();
-        $composeMessage = $message->composeMessage();
+		if ($sess[0] == "OK") {
+			$this->session_id = trim($sess[1]);
+		} else {
+			throw new \RuntimeException('Authentication failure.');
+		}
+	}
 
-        foreach($message->getTo() as $to){
-            $url = $this->apiBase."/http/sendmsg";
-            $url .= "?session_id=".$this->session_id;
-            $url .= "&to=".$to."&text=".$composeMessage;
+	/**
+	 * Creates many IncomingMessage objects and sets all of the properties.
+	 *
+	 * @param $rawMessage
+	 * @return mixed
+	 */
+	protected function processReceive($rawMessage) {
+		throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
+	}
 
-            $ret = file($url);
-            $response = explode(":",$ret[0]);
-            if ($response[0] == "ID") {
-                // TODO: action log
-            } else {
-                echo "send message failed";
-            }
-        }
-    }
+	/**
+	 * Sends a SMS message
+	 *
+	 * @parma SimpleSoftwareIO\SMS\Message @messasge The message class.
+	 * @return void
+	 */
+	public function send(OutgoingMessage $message) {
+		$this->authenticate();
+		$composeMessage = urlencode($message->composeMessage());
 
-    /**
-     * Checks the server for messages and returns their results.
-     *
-     * @param array $options
-     * @return array
-     */
-    public function checkMessages(Array $options = array())
-    {
-        throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
-    }
+		foreach ($message->getTo() as $to) {
+			$url = $this->apiBase . '/http/sendmsg';
+			$url .= '?session_id=' . $this->session_id;
+			$url .= '&to=' . $to . '&text=' . $composeMessage;
 
-    /**
-     * Gets a single message by it's ID.
-     *
-     * @param $messageId
-     * @return IncomingMessage
-     */
-    public function getMessage($messageId)
-    {
-        throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
-    }
+			$ret = file($url);
+			$response = explode(":", $ret[0]);
+			if ($response[0] == "ID") {
+				// TODO: action log
+			} else {
+				throw new \RuntimeException('send message failed.');
+			}
+		}
+	}
 
-    /**
-     * Receives an incoming message via REST call.
-     *
-     * @param $raw
-     * @return \SimpleSoftwareIO\SMS\IncomingMessage
-     */
-    public function receive($raw)
-    {
-        // TODO: Implement receive() method.
-    }
+	/**
+	 * Checks the server for messages and returns their results.
+	 *
+	 * @param array $options
+	 * @return array
+	 */
+	public function checkMessages(Array $options = array()) {
+		throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
+	}
+
+	/**
+	 * Gets a single message by it's ID.
+	 *
+	 * @param $messageId
+	 * @return IncomingMessage
+	 */
+	public function getMessage($messageId) {
+		throw new \RuntimeException('Clickatell does not support Inbound API Calls.');
+	}
+
+	/**
+	 * Receives an incoming message via REST call.
+	 *
+	 * @param $raw
+	 * @return \SimpleSoftwareIO\SMS\IncomingMessage
+	 */
+	public function receive($raw) {
+		// TODO: Implement receive() method.
+	}
 
 }
