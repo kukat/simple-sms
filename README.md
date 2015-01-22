@@ -14,6 +14,7 @@ Simple SMS
     * [Email Driver](#email-driver)
     * [Mozeo Driver](#mozeo-driver)
     * [Twilio Driver](#twilio-driver)
+    * [Clicatell Driber](#clickatell-driver)
 * [Driver Support](#driver-support)
 * [Usage](#usage)
 * [Outgoing Message Enclosure](#message-enclosure)
@@ -173,6 +174,22 @@ This driver sends messages through the [Twilio](https://www.twilio.com/sms) mess
 It is strongly recommended to have the `verify` option enabled.  This setting performs an addational security check to ensure messages are coming from Twilio and not being spoofed.
 
 To enable `receive()` messages you must set up the [request URL.](https://www.twilio.com/user/account/phone-numbers/incoming)  Select the number you wish to enable and then enter your request URL.  This request should be a `POST` request.
+
+<a id="clickatell-driver"></a>
+######  Clickatell Driver
+
+This driver sends messages through the [Clickatel](https://www.clickatell.com/sms/) messaging service.  It is very reliable and capable of sending messages to mobile phones worldwide.
+
+	return [
+		'driver' => 'clickatell',
+		'from' => 'Not Implemented with Clickatell', 
+		'twilio' => [
+			'username' => 'Your clickatell Username',
+			'password' => 'Your clickatell Password',
+			'api_id' => 'Your clickatell API Id',
+		]
+	];
+
 
 <a id="driver-support"></a>
 ##Driver Support

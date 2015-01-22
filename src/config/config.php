@@ -19,18 +19,25 @@
     |           The Email driver will send messages out based on your Laravel
     |           mail settings.
     |   Twilio: Twilio is an SMS service that sends messages at a affordable
-    |           and reliable rate.
+    |           and reliable rate. 
+    |   Clickatell: Clickatell is an SMS service that sends messages at a 
+    |           affordable and reliable rate.
     |--------------------------------------------------------------------------
     | From
     |   Email:  The from address must be a valid email address.
     |   Twilio: The from address must be a verified phone number within Twilio.
+    |   Clickatell: The from address must be a verified phone number
     |--------------------------------------------------------------------------
     | Twilio Additional Settings
     |   Account SID:  The Account SID associated with your Twilio account.
     |   Auth Token:   The Auth Token associated with your Twilio account.
     |   Verify:       Ensures extra security by checking if requests
     |                 are really coming from Twilio.
-    |
+    |--------------------------------------------------------------------------
+    | Clickatell Additional Settings
+    |   api_id: The API Id associated with your Clickatell account
+    |   Base URL: Base URL for the Clickatell API End Point
+    |   
 */
 
 return [
@@ -57,5 +64,10 @@ return [
     'optikseis' => [
         'username' => 'Your optikseis username',
         'password' => 'Your optikseis password'
+    ],
+    'clickatell' => [
+        'username' => 'Your clickatell Username',
+        'password' => 'Your clickatell Password',
+        'api_id' => 'Your clickatell API Id',
     ]
 ];

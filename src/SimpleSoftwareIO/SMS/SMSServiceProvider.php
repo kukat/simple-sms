@@ -17,6 +17,7 @@ use SimpleSoftwareIO\SMS\Drivers\EZTextingSMS;
 use SimpleSoftwareIO\SMS\Drivers\MozeoSMS;
 use SimpleSoftwareIO\SMS\Drivers\OptikseisSMS;
 use SimpleSoftwareIO\SMS\Drivers\TwilioSMS;
+use SimpleSoftwareIO\SMS\Drivers\ClickatellSMS;
 
 class SMSServiceProvider extends ServiceProvider
 {
@@ -92,6 +93,9 @@ class SMSServiceProvider extends ServiceProvider
             case 'optikseis':
                 return $this->buildOptikseis();
 
+            case 'clickatell':
+                return $this->buildClickatell();
+
             default:
                 throw new \InvalidArgumentException('Invalid SMS driver.');
         }
@@ -163,6 +167,19 @@ class SMSServiceProvider extends ServiceProvider
         return $provider;
     }
 
+    protected function buildClickatell(){
+        $provider = new ClickatellSMS(new Client);
+
+        $auth = array(
+            'username' => $this->app['config']->get('simple-sms::clickatell.username'),
+            'password' => $this->app['config']->get('simple-sms::clickatell.password'),
+            'api_id'   => $this->app['config']->get('simple-sms::clickatell.api_id'),
+        );
+
+        $provider->buildBody($auth);
+
+        return $provider;
+    }
     /**
      * Get the services provided by the provider.
      *
